@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <title>Vue JS Practice</title>
+  </head>
+  <body>
+    <div id="app">
+      <header v-if="!notLoggedIn">
+        <div class="user-info">
+          <div class="profile-pic">
+            <img
+              src="https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1492"
+              alt="User Profile Picture"
+            />
+          </div>
+          <h5>Saif raza</h5>
+        </div>
+        <div class="logout-btn">
+          <button @click="handleLogout">Logout</button>
+        </div>
+      </header>
+      <div class="login-form" v-if="notLoggedIn">
+        <h1>Login To Continue</h1>
+        <form onsubmit="return false;">
+          <input
+            type="email"
+            placeholder="Email"
+            required
+            @input="handleFormInput($event,'email')"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            required
+            @input="handleFormInput($event,'password')"
+          />
+          <button @click="handleLogin">Login</button>
+        </form>
+      </div>
+      <div class="todo-app" v-else>
+        <div class="todo-header">
+          <h1>Todo App By using Vue.js</h1>
+          <input
+            type="text"
+            placeholder="Write todo..."
+            :value="todoVal"
+            @input="handleTodo($event,'todoVal')"
+          />
+          <input
+            type="date"
+            id="start"
+            @input="handleTodo($event,'todoDate')"
+          />
+          <button @click="addTodo" class="add-btn">Add</button>
+        </div>
+        <div>
+          <h2>Today's Tasks</h2>
+          <p>Current Date is: <b>{{today_date}}</b></p>
+          <div class="todos-wrapper">
+            <div class="todo-list">
+              <h3>To Do:</h3>
+              <ul v-if="todos.length>0">
+                <li v-for="todo in todos">
+                  <p>Todo: <b>{{todo.title}}</b></p>
+                  <p>When: {{todo.date}}</p>
+                  <button @click="markCompleted(todo)">
+                    Mark as Completed
+                  </button>
+                  <button @click="deleteFromTodo(todo)">Delete Todo</button>
+                </li>
+              </ul>
+              <div v-else>
+                <p>No Data Found</p>
+              </div>
+            </div>
+            <div class="todo-list">
+              <h3>Completed:</h3>
+              <ul v-if="completedTodos.length>0">
+                <li v-for="todo in completedTodos">
+                  <p>
+                    <del>Todo: <b>{{todo.title}}</b></del>
+                  </p>
+                  <p><del>When: {{todo.date}}</del></p>
+                  <button @click="putBack(todo)">Put Back</button>
+                  <button @click="deleteFromCompletedTodo(todo)">
+                    Delete Todo
+                  </button>
+                </li>
+              </ul>
+              <div v-else>
+                <p>No Data Found</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr />
+        <div class="old-new-todos-wrapper">
+          <div class="non-active-todos">
+            <h2>Previous Taks:</h2>
+            <ul v-if="previous_todos.length>0">
+              <li v-for="todo in previous_todos">
+                <p>Todo: <b>{{todo.title}}</b></p>
+                <p>When: {{todo.date}}</p>
+              </li>
+            </ul>
+            <div v-else>
+              <p>No Data Found</p>
+            </div>
+          </div>
+          <div class="non-active-todos">
+            <h2>Upcoming Taks:</h2>
+            <ul v-if="upcoming_todos.length>0">
+              <li v-for="todo in upcoming_todos">
+                <p>Todo: <b>{{todo.title}}</b></p>
+                <p>When: {{todo.date}}</p>
+              </li>
+            </ul>
+            <div v-else>
+              <p>No Data Found</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="./script.js"></script>
+  </body>
+  <style>
+    header {
+      height: 100px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding-right: 20px;
+      box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      background-color: #f7ded0;
+    }
+    header button {
+      margin: 0;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+    }
+    .logout-btn {
+      margin-left: 10px;
+    }
+    .profile-pic {
+      height: 50px;
+      width: 50px;
+      overflow: hidden;
+      border-radius: 50px;
+      margin-right: 10px;
+    }
+    .profile-pic img {
+      object-fit: cover;
+      height: 100%;
+      width: 100%;
+    }
+    #app {
+      height: 100%;
+    }
+    .login-form {
+      height: 100%;
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .todo-app {
+      padding: 30px;
+      margin-top: 50px;
+    }
+    .todo-header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    input {
+      height: 30px;
+      font-size: 18px;
+      width: 350px;
+      padding: 10px;
+      border-radius: 10px;
+      display: block;
+      outline: none;
+      border: 1px solid transparent;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    input:focus {
+      border-color: #ffbe98;
+    }
+    button {
+      margin-top: 20px;
+      border-radius: 5px;
+      border: none;
+      padding: 15px 40px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      text-transform: uppercase;
+      margin-right: 10px;
+      background-color: #feece2;
+      color: black;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background-color: #ffbe98;
+    }
+    body {
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #f7ded0;
+    }
+    .todos-wrapper {
+      display: flex;
+      justify-content: space-between;
+    }
+    .todo-list {
+      margin-top: 50px;
+      width: 48%;
+      padding: 20px;
+      background-color: #e2bfb3;
+      box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
+      height: fit-content;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+    }
+    ul {
+      padding-left: 10px;
+    }
+    ul li {
+      margin: 10px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 20px 0;
+      list-style-type: none;
+    }
+    h5 {
+      font-size: 16px;
+    }
+    h3 {
+      font-size: 22px;
+    }
+    h1 {
+      margin: 0;
+      margin-bottom: 30px;
+      font-size: 52px;
+    }
+    h2 {
+      font-size: 36px;
+    }
+    hr {
+      margin: 100px 0;
+      border-color: #ffbe98;
+      border-width: 2px;
+      border-style: dashed;
+    }
+    .old-new-todos-wrapper {
+      display: flex;
+      justify-content: space-between;
+    }
+    .non-active-todos {
+      width: 48%;
+      background-color: #feece2;
+      border-radius: 10px;
+      box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      box-sizing: border-box;
+    }
+  </style>
+</html>
